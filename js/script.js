@@ -1,5 +1,5 @@
 /*----- constants -----*/
-const diagConditions = [
+const winConditions = [
     {
         startingIndex: '20',
         rowInc: 1,
@@ -60,6 +60,71 @@ const diagConditions = [
         rowInc: 1,
         colInc: -1,
     },
+    {
+        startingIndex: '00',
+        rowInc: 0,
+        colInc: 1,
+    },
+    {
+        startingIndex: '10',
+        rowInc: 0,
+        colInc: 1,
+    },
+    {
+        startingIndex: '20',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '30',
+        rowInc: 0,
+        colInc: 1,
+    },
+    {
+        startingIndex: '40',
+        rowInc: 0,
+        colInc: 1,
+    },
+    {
+        startingIndex: '50',
+        rowInc: 0,
+        colInc: 1,
+    },
+    {
+        startingIndex: '00',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '01',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '02',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '03',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '04',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '05',
+        rowInc: 1,
+        colInc: 0,
+    },
+    {
+        startingIndex: '06',
+        rowInc: 1,
+        colInc: 0,
+    },
 ]
 
 /*----- app's state (variables) -----*/
@@ -73,10 +138,9 @@ var board = [
 ];
 
 var player = "Blue";
-var row, col, winner;
-var horizCount = 0;
-var vertCount = 0;
-var diagCount = 0;
+var row, col;
+var winner = false;
+var count = 0;
 
 /*----- cached element references -----*/
 var cells = document.getElementsByClassName('cell');
@@ -122,58 +186,26 @@ function render() {
 }
 
 function checkWin() { 
-    horizWin("Blue");
-    horizWin("Yellow");
-    vertWin("Blue");
-    vertWin("Yellow");
-    diagConditions.forEach(cond => {
-        diagWin("Blue", parseInt(cond.startingIndex[0]), parseInt(cond.startingIndex[1]), cond.rowInc, cond.colInc)
-        diagWin("Yellow", parseInt(cond.startingIndex[0]), parseInt(cond.startingIndex[1]), cond.rowInc, cond.colInc)
+    winConditions.forEach(cond => {
+        analyzeBoard("Blue", parseInt(cond.startingIndex[0]), parseInt(cond.startingIndex[1]), cond.rowInc, cond.colInc)
+        analyzeBoard("Yellow", parseInt(cond.startingIndex[0]), parseInt(cond.startingIndex[1]), cond.rowInc, cond.colInc)
     })
 }
 
-function horizWin(incomingPlayer) {
-    for (let rowNum = 0; rowNum < 6; rowNum++) {
-        for (let colNum = 0; colNum < 6; colNum++) {
-            if (board[rowNum][colNum] == board[rowNum][colNum+1] && board[rowNum][colNum] == incomingPlayer) {
-                horizCount++;
-            } 
-        }
-        if (horizCount == 3) {
-            winner = incomingPlayer
-        } 
-        horizCount = 0;
-    }
-}
-
-function vertWin(incomingPlayer) {
-    for (let colNum = 0; colNum < 7; colNum++) {
-        for (let rowNum = 0; rowNum < 5; rowNum++) {
-            if (board[rowNum][colNum] == board[rowNum+1][colNum] && board[rowNum][colNum] == incomingPlayer) {
-                vertCount++;
-            } 
-        }
-        if (vertCount == 3) {
-            winner = incomingPlayer
-        } 
-        vertCount = 0;
-    }
-}
-
-function diagWin(incomingPlayer, startingRow, startingCol, rowInc, colInc) {
+function analyzeBoard(incomingPlayer, startingRow, startingCol, rowInc, colInc) {
     let [rowNum, colNum] = [startingRow, startingCol];
     let [nextRow, nextCol] = [rowNum + rowInc, colNum + colInc];
     while (rowNum >= 0 && colNum >=0 && nextRow <= 5 && nextCol <= 6) {
         if (board[rowNum][colNum] == board[rowNum + rowInc][colNum + colInc] && board[rowNum][colNum] == incomingPlayer) {
-            diagCount++;
+            count++;
         }
         [rowNum, colNum] = [rowNum + rowInc, colNum + colInc];
         [nextRow, nextCol] = [rowNum + rowInc, colNum + colInc];
     }
-    if (diagCount == 3) {
+    if (count == 3) {
         winner = incomingPlayer
     }
-    diagCount = 0;
+    count = 0;
 }
 
 function colFull(col) {
@@ -184,6 +216,7 @@ function colFull(col) {
 }
 
 function reset() {
+    winner = false;
     board = [
         ["","","","","","",""],
         ["","","","","","",""],
